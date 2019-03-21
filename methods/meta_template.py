@@ -12,7 +12,7 @@ class MetaTemplate(nn.Module):
         super(MetaTemplate, self).__init__()
         self.n_way      = n_way
         self.n_support  = n_support
-        self.n_query    = -1 #(change depends on input) 
+        self.n_query    = -1 #(change depends on input)
         self.feature    = model_func()
         self.feat_dim   = self.feature.final_feat_dim
         self.change_way = change_way  #some methods allow different_way classification during training and test
@@ -34,7 +34,7 @@ class MetaTemplate(nn.Module):
         if is_feature:
             z_all = x
         else:
-            x           = x.contiguous().view( self.n_way * (self.n_support + self.n_query), *x.size()[2:]) 
+            x           = x.contiguous().view( self.n_way * (self.n_support + self.n_query), *x.size()[2:])
             z_all       = self.feature.forward(x)
             z_all       = z_all.view( self.n_way, self.n_support + self.n_query, -1)
         z_support   = z_all[:, :self.n_support]
@@ -42,7 +42,7 @@ class MetaTemplate(nn.Module):
 
         return z_support, z_query
 
-    def correct(self, x):       
+    def correct(self, x):
         scores = self.set_forward(x)
         y_query = np.repeat(range( self.n_way ), self.n_query )
 
@@ -56,14 +56,14 @@ class MetaTemplate(nn.Module):
 
         avg_loss=0
         for i, (x,_ ) in enumerate(train_loader):
-            self.n_query = x.size(1) - self.n_support           
+            self.n_query = x.size(1) - self.n_support
             if self.change_way:
                 self.n_way  = x.size(0)
             optimizer.zero_grad()
             loss = self.set_forward_loss( x )
             loss.backward()
             optimizer.step()
-            avg_loss = avg_loss+loss.data[0]
+            avg_loss = avg_loss+loss.item()
 
             if i % print_freq==0:
                 #print(optimizer.state_dict()['param_groups'][0]['lr'])
@@ -73,8 +73,8 @@ class MetaTemplate(nn.Module):
         correct =0
         count = 0
         acc_all = []
-        
-        iter_num = len(test_loader) 
+
+        iter_num = len(test_loader)
         for i, (x,_) in enumerate(test_loader):
             self.n_query = x.size(1) - self.n_support
             if self.change_way:
@@ -106,7 +106,7 @@ class MetaTemplate(nn.Module):
 
         loss_function = nn.CrossEntropyLoss()
         loss_function = loss_function.cuda()
-        
+
         batch_size = 4
         support_size = self.n_way* self.n_support
         for epoch in range(100):
@@ -115,7 +115,7 @@ class MetaTemplate(nn.Module):
                 set_optimizer.zero_grad()
                 selected_id = torch.from_numpy( rand_id[i: min(i+batch_size, support_size) ]).cuda()
                 z_batch = z_support[selected_id]
-                y_batch = y_support[selected_id] 
+                y_batch = y_support[selected_id]
                 scores = linear_clf(z_batch)
                 loss = loss_function(scores,y_batch)
                 loss.backward()
