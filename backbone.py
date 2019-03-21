@@ -35,19 +35,19 @@ class distLinear(nn.Module):
         L_norm = torch.norm(self.L.weight.data, p=2, dim =1).unsqueeze(1).expand_as(self.L.weight.data)
         self.L.weight.data = self.L.weight.data.div(L_norm + 0.00001)
         cos_dist = self.L(x_normalized) #matrix product by forward function
-        scores = self.scale_factor* (cos_dist) 
+        scores = self.scale_factor* (cos_dist)
 
         return scores
 
 class Flatten(nn.Module):
     def __init__(self):
         super(Flatten, self).__init__()
-        
-    def forward(self, x):        
+
+    def forward(self, x):
         return x.view(x.size(0), -1)
 
 
-class Linear_fw(nn.Linear): #used in MAML to forward input with fast weight 
+class Linear_fw(nn.Linear): #used in MAML to forward input with fast weight
     def __init__(self, in_features, out_features):
         super(Linear_fw, self).__init__(in_features, out_features)
         self.weight.fast = None #Lazy hack to add fast weight link
@@ -60,7 +60,7 @@ class Linear_fw(nn.Linear): #used in MAML to forward input with fast weight
             out = super(Linear_fw, self).forward(x)
         return out
 
-class Conv2d_fw(nn.Conv2d): #used in MAML to forward input with fast weight 
+class Conv2d_fw(nn.Conv2d): #used in MAML to forward input with fast weight
     def __init__(self, in_channels, out_channels, kernel_size, stride=1,padding=0, bias = True):
         super(Conv2d_fw, self).__init__(in_channels, out_channels, kernel_size, stride=stride, padding=padding, bias=bias)
         self.weight.fast = None
@@ -80,8 +80,8 @@ class Conv2d_fw(nn.Conv2d): #used in MAML to forward input with fast weight
                 out = super(Conv2d_fw, self).forward(x)
 
         return out
-            
-class BatchNorm2d_fw(nn.BatchNorm2d): #used in MAML to forward input with fast weight 
+
+class BatchNorm2d_fw(nn.BatchNorm2d): #used in MAML to forward input with fast weight
     def __init__(self, num_features):
         super(BatchNorm2d_fw, self).__init__(num_features)
         self.weight.fast = None
@@ -348,7 +348,8 @@ class ResNet(nn.Module):
         for i in range(4):
 
             for j in range(list_of_num_layers[i]):
-                half_res = (i>=1) and (j==0)
+#                half_res = (i>=1) and (j==0)
+                half_res = (i==1) and (j==0)
                 B = block(indim, list_of_out_dims[i], half_res)
                 trunk.append(B)
                 indim = list_of_out_dims[i]
@@ -359,7 +360,8 @@ class ResNet(nn.Module):
             trunk.append(Flatten())
             self.final_feat_dim = indim
         else:
-            self.final_feat_dim = [ indim, 7, 7]
+#            self.final_feat_dim = [ indim, 7, 7]
+            self.final_feat_dim = [ indim, 16, 16]
 
         self.trunk = nn.Sequential(*trunk)
 
