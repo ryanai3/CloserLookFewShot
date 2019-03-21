@@ -140,12 +140,18 @@ class SimpleBlock(nn.Module):
             self.C2 = Conv2d_fw(outdim, outdim,kernel_size=3, padding=1,bias=False)
             self.BN2 = BatchNorm2d_fw(outdim)
         else:
+#            self.C1 = nn.Conv2d(indim, outdim, kernel_size=3, stride=2 if half_res else 1, padding=1, bias=False)
+#            self.BN1 = nn.BatchNorm2d(outdim)
+#            self.C2 = nn.Conv2d(outdim, outdim,kernel_size=3, padding=1,bias=False)
+#            self.BN2 = nn.BatchNorm2d(outdim)
+            self.BN1 = nn.BatchNorm2d(indim)
             self.C1 = nn.Conv2d(indim, outdim, kernel_size=3, stride=2 if half_res else 1, padding=1, bias=False)
-            self.BN1 = nn.BatchNorm2d(outdim)
-            self.C2 = nn.Conv2d(outdim, outdim,kernel_size=3, padding=1,bias=False)
             self.BN2 = nn.BatchNorm2d(outdim)
+            self.C2 = nn.Conv2d(outdim, outdim,kernel_size=3, padding=1,bias=False)
         self.relu1 = nn.ReLU(inplace=True)
         self.relu2 = nn.ReLU(inplace=True)
+        self.relu1 = nn.LeakyReLU()
+        self.relu2 = nn.LeakyReLU()
 
         self.parametrized_layers = [self.C1, self.C2, self.BN1, self.BN2]
 
@@ -169,17 +175,26 @@ class SimpleBlock(nn.Module):
         for layer in self.parametrized_layers:
             init_layer(layer)
 
+#    def forward(self, x):
+#        out = self.C1(x)
+#        out = self.BN1(out)
+#        out = self.relu1(out)
+#        out = self.C2(out)
+#        out = self.BN2(out)
+#        short_out = x if self.shortcut_type == 'identity' else self.BNshortcut(self.shortcut(x))
+#        out = out + short_out
+#        out = self.relu2(out)
+#        return out
     def forward(self, x):
-        out = self.C1(x)
-        out = self.BN1(out)
+        out = self.BN1(x)
+        out = self.C1(out)
         out = self.relu1(out)
-        out = self.C2(out)
         out = self.BN2(out)
+        out = self.C2(out)
+        out = self.relu2(out)
         short_out = x if self.shortcut_type == 'identity' else self.BNshortcut(self.shortcut(x))
         out = out + short_out
-        out = self.relu2(out)
         return out
-
 
 
 # Bottleneck block
