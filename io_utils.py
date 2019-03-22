@@ -31,7 +31,7 @@ def parse_args(script):
         parser.add_argument('--resume'      , action='store_true', help='continue from previous trained model with largest epoch')
         parser.add_argument('--warmup'      , action='store_true', help='continue from baseline, neglected if resume is true') #never used in the paper
         parser.add_argument('--n_ex'        , default=30, type=int, help='n_ex_per_class')
-        parser.add_argument('--seed'        , default=-1, type=int, help='randoms seed')
+        parser.add_argument('--seed'        , default=10, type=int, help='randoms seed')
 
     elif script == 'save_features':
         parser.add_argument('--split'       , default='novel', help='base/val/novel') #default novel, but you can also test base/val class accuracy if you want
