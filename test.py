@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import torch
 import numpy as np
 from torch.autograd import Variable
@@ -51,7 +52,7 @@ if __name__ == '__main__':
 
     iter_num = 600
 
-    few_shot_params = dict(n_way = params.test_n_way , n_support = params.n_shot)
+    few_shot_params = dict(n_way = 25 , n_support = params.n_shot)
 
     if params.dataset in ['omniglot', 'cross_char']:
         assert params.model == 'Conv4' and not params.train_aug ,'omniglot only support Conv4 without augmentation'
@@ -92,10 +93,14 @@ if __name__ == '__main__':
     model = model.cuda()
 
     checkpoint_dir = '%s/checkpoints/%s/%s_%s' %(configs.save_dir, params.dataset, params.model, params.method)
+
     if params.train_aug:
         checkpoint_dir += '_aug'
     if not params.method in ['baseline', 'baseline++'] :
         checkpoint_dir += '_%dway_%dshot' %( params.train_n_way, params.n_shot)
+    checkpoint_dir += 'n_ex_{0}'.format(params.n_ex)
+    checkpoint_dir += 'n_cls_{0}'.format(params.n_train_classes)
+    checkpoint_dir += 'seed_{0}'.format(params.seed)
 
     #modelfile   = get_resume_file(checkpoint_dir)
 
@@ -163,5 +168,8 @@ if __name__ == '__main__':
             exp_setting = '%s-%s-%s-%s%s %sshot %sway_test' %(params.dataset, split_str, params.model, params.method, aug_str, params.n_shot, params.test_n_way )
         else:
             exp_setting = '%s-%s-%s-%s%s %sshot %sway_train %sway_test' %(params.dataset, split_str, params.model, params.method, aug_str , params.n_shot , params.train_n_way, params.test_n_way )
+        exp_setting += 'n_ex_{0}'.format(params.n_ex)
+        exp_setting += 'n_cls_{0}'.format(params.n_train_classes)
+        exp_setting += 'seed_{0}'.format(params.seed)
         acc_str = '%d Test Acc = %4.2f%% +- %4.2f%%' %(iter_num, acc_mean, 1.96* acc_std/np.sqrt(iter_num))
         f.write( 'Time: %s, Setting: %s, Acc: %s \n' %(timestamp,exp_setting,acc_str)  )
