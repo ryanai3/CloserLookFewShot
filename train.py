@@ -55,6 +55,9 @@ if __name__=='__main__':
     params = parse_args('train')
 
     print("using {0} examples per class!".format(params.n_ex))
+    if params.seed != -1:
+      import random
+      random.seed(params.seed)
 
     if params.dataset == 'cross':
         base_file = configs.data_dir['miniImagenet'] + 'all.json'
