@@ -7,6 +7,9 @@ import numpy as np
 import torchvision.transforms as transforms
 import os
 identity = lambda x:x
+
+import random
+
 class SimpleDataset:
     def __init__(self, data_file, transform, target_transform=identity):
         with open(data_file, 'r') as f:
@@ -27,10 +30,10 @@ class SimpleDataset:
 
 
 class SetDataset:
-    def __init__(self, data_file, batch_size, transform):
+    def __init__(self, data_file, batch_size, transform, n_ex_per_class=None):
         with open(data_file, 'r') as f:
             self.meta = json.load(f)
- 
+
         self.cl_list = np.unique(self.meta['image_labels']).tolist()
 
         self.sub_meta = {}
@@ -40,13 +43,13 @@ class SetDataset:
         for x,y in zip(self.meta['image_names'],self.meta['image_labels']):
             self.sub_meta[y].append(x)
 
-        self.sub_dataloader = [] 
+        self.sub_dataloader = []
         sub_data_loader_params = dict(batch_size = batch_size,
                                   shuffle = True,
                                   num_workers = 0, #use main thread only or may receive multiple batches
-                                  pin_memory = False)        
+                                  pin_memory = False)
         for cl in self.cl_list:
-            sub_dataset = SubDataset(self.sub_meta[cl], cl, transform = transform )
+            sub_dataset = SubDataset(self.sub_meta[cl], cl, transform = transform, n_ex=n_ex_per_class)
             self.sub_dataloader.append( torch.utils.data.DataLoader(sub_dataset, **sub_data_loader_params) )
 
     def __getitem__(self,i):
@@ -56,11 +59,14 @@ class SetDataset:
         return len(self.cl_list)
 
 class SubDataset:
-    def __init__(self, sub_meta, cl, transform=transforms.ToTensor(), target_transform=identity):
+    def __init__(self, sub_meta, cl, transform=transforms.ToTensor(), target_transform=identity, n_ex=None):
         self.sub_meta = sub_meta
-        self.cl = cl 
+        self.cl = cl
         self.transform = transform
         self.target_transform = target_transform
+        if n_ex is not None:
+          random.shuffle(self.sub_meta)
+          self.sub_meta = self.sub_meta[:n_ex]
 
     def __getitem__(self,i):
         #print( '%d -%d' %(self.cl,i))
