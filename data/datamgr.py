@@ -52,7 +52,7 @@ class DataManager:
 class SimpleDataManager(DataManager):
     def __init__(self, image_size, batch_size):
         super(SimpleDataManager, self).__init__()
-        self.batch_size = batch_siz,e
+        self.batch_size = batch_size
         self.trans_loader = TransformLoader(image_size)
 
     def get_data_loader(self, data_file, aug): #parameters that would change on train/val set
