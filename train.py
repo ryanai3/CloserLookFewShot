@@ -152,6 +152,9 @@ if __name__=='__main__':
         params.checkpoint_dir += '_aug'
     if not params.method  in ['baseline', 'baseline++']:
         params.checkpoint_dir += '_%dway_%dshot' %( params.train_n_way, params.n_shot)
+    params.checkpoint_dir += 'n_ex_{0}'.format(params.n_ex)
+    params.checkpoint_dir += 'seed_{0}'.format(params.seed)
+
 
     if not os.path.isdir(params.checkpoint_dir):
         os.makedirs(params.checkpoint_dir)
