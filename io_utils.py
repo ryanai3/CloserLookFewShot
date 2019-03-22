@@ -31,6 +31,7 @@ def parse_args(script):
         parser.add_argument('--resume'      , action='store_true', help='continue from previous trained model with largest epoch')
         parser.add_argument('--warmup'      , action='store_true', help='continue from baseline, neglected if resume is true') #never used in the paper
         parser.add_argument('--n_ex'        , default=30, type=int, help='n_ex_per_class')
+        parser.add_argument('--n_query'     , default=5, type=int, help='n_query imgs per batch per class (n_query +n_shot <= n_ex)')
         parser.add_argument('--seed'        , default=10, type=int, help='randoms seed')
 
     elif script == 'save_features':
