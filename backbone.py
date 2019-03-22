@@ -370,7 +370,7 @@ class ResNet(nn.Module):
                 indim = list_of_out_dims[i]
 
         if flatten:
-            avgpool = nn.AvgPool2d(7)
+            avgpool = nn.AvgPool2d(16)
             trunk.append(avgpool)
             trunk.append(Flatten())
             self.final_feat_dim = indim
@@ -382,6 +382,7 @@ class ResNet(nn.Module):
 
     def forward(self,x):
         out = self.trunk(x)
+#        import pdb; pdb.set_trace()
         return out
 
 def Conv4():
