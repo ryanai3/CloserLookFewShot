@@ -30,11 +30,15 @@ class SimpleDataset:
 
 
 class SetDataset:
-    def __init__(self, data_file, batch_size, transform, n_ex_per_class=None):
+    def __init__(self, data_file, batch_size, transform, n_ex_per_class=None, n_class=None):
         with open(data_file, 'r') as f:
             self.meta = json.load(f)
 
         self.cl_list = np.unique(self.meta['image_labels']).tolist()
+        if n_class is not None:
+          random.shuffle(self.cl_list)
+          self.cl_list = self.cl_list[:n_class]
+
 
         self.sub_meta = {}
         for cl in self.cl_list:

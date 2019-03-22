@@ -106,7 +106,7 @@ if __name__=='__main__':
         train_few_shot_params    = dict(n_way = params.train_n_way, n_support = params.n_shot)
         base_datamgr            = SetDataManager(
                                     image_size, n_query = n_query, n_ex_per_class = params.n_ex,
-                                    **train_few_shot_params
+                                    n_class = params.n_train_classes, **train_few_shot_params
                                   )
         base_loader             = base_datamgr.get_data_loader( base_file , aug = params.train_aug )
 
